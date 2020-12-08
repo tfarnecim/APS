@@ -8,6 +8,12 @@ class Bilhete:
 		self.Usuario = Usuario
 		self.Sessao = Sessao
 
+	def GetUsuario(self):
+		return self.Usuario
+
+	def GetSessao(self):
+		return self.Sessao
+
 	def GetId(self):
 		return self.Id
 
