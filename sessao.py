@@ -10,9 +10,8 @@ class Sessao:
 		self.Filme = Filme
 		self.Id = Id
 
-	#gets de filme
-	def GetIdFilme(self):
-		return self.Filme.Id
+	def GetFilme(self):
+		return self.Filme
 
 	def SetNumeroDaSala(self, NumeroDaSala):
 		self.NumeroDaSala = NumeroDaSala
