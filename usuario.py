@@ -5,10 +5,6 @@ class Usuario:
 		self.Email = Email
 		self.Senha = Senha
 
-	def GetBilhetes(self):
-		#Falta fazer
-		pass
-
 	def SetCpf(self, Cpf):
 		self.Cpf = Cpf
 
