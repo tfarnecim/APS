@@ -1,9 +1,14 @@
+from funcionario import Funcionario
+
 class Filme:
 
-	def __init__(self, Id, Nome, Descricao):
+	def __init__(self, Id, Nome, Descricao, Funcionario):
 		self.Id = Id
 		self.Nome = Nome
 		self.Descricao = Descricao
+
+	def GetFuncionario(self):
+		return self.Funcionario
 
 	def SetId(self, Id):
 		self.Id = Id
