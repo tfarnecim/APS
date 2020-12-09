@@ -40,12 +40,6 @@ def Cadastro(cpf,email,senha):
 
 	if(inv):
 		return 3
-	else:
-		s = 0
-		for i in cpf:
-			s += int(i)
-		if(s != 44):
-			return 3
 
 	if(len(senha) < 5 or len(senha) > 15):
 		return 4
@@ -189,7 +183,8 @@ while(menu1!=3):
 				print("\nDeseja retornar ao menu principal?\n[1]Sim\n[2]Nao\n")
 				menu2 = int(input())
 				if(menu2==1):
-					volta = True
+					volta = True,
+					break
 			else:
 				os.system("pause")
 
