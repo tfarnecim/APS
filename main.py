@@ -1,3 +1,9 @@
+'''
+
+©All rights reserved to GuaraTec
+
+'''
+
 from filme import Filme
 from sessao import Sessao
 from bilhete import Bilhete
@@ -6,7 +12,7 @@ from funcionario import Funcionario
 import psycopg2
 import os
 
-#Inicio das User Stories do programa'''
+#Inicio das User Stories do programa
 
 def Cadastro(cpf,email,senha):
 
@@ -183,7 +189,7 @@ while(menu1!=3):
 				print("\nDeseja retornar ao menu principal?\n[1]Sim\n[2]Nao\n")
 				menu2 = int(input())
 				if(menu2==1):
-					volta = True,
+					volta = True
 					break
 			else:
 				os.system("pause")
