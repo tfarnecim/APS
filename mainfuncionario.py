@@ -1,6 +1,6 @@
 '''
 
-©All rights reserved to GuaraTec
+© All rights reserved to GuaraTec
 
 '''
 
