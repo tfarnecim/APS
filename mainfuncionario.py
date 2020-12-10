@@ -61,4 +61,68 @@ def Cadastro(cpf,senha):
 
 #O Código do funcionamento do programa começa aqui
 
+menu1 = 0
+
+while(menu1!=3):
+
+	os.system('cls')
+
+	print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+	print("|                                 |")
+	print("|        CINEMA CIDADE LUZ        |")
+	print("|                                 |")
+	print("|        [1]Registrar             |")
+	print("|        [2]Login                 |")
+	print("|        [3]Sair                  |")
+	print("|                                 |")
+	print("|                                 |")
+	print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+	menu1 = int(input())
+
+	if(menu1 == 1):#caso o usuario deseje se registrar
+
+		menu2 = 0
+
+		Log = [
+			"",
+			"Usuario Cadastrado",
+			"Campo vazio",
+			"CPF inválido",
+			"Senha inválida (senhas devem conter de 5 a 15 caracteres)",
+			"CPF já cadastrado"
+		]
+		
+		volta = False
+
+		while(menu2 != 1):
+
+			cpf   = ""
+			senha = ""
+
+			os.system("cls")
+			cpf   = input("Digite seu CPF: ")
+			senha = input("Digite sua nova SENHA: ")
+
+			menu2 = Cadastro(cpf,email,senha)
+			print("\nLOG: %s"%(Log[menu2]))
+
+			if(menu2!=1):
+				print("\nDeseja retornar ao menu principal?\n[1]Sim\n[2]Nao\n")
+				menu2 = int(input())
+				if(menu2==1):
+					volta = True
+					break
+			else:
+				os.system("pause")
+
+		if(volta == True):		
+			continue
+
+	if(menu1 == 2):
+		os.system("cls")
+		print("NAO FUNCIONA")
+		while(1):
+			pass
+
+os.system("cls")
 
