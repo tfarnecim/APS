@@ -103,7 +103,7 @@ while(menu1!=3):
 			cpf   = input("Digite seu CPF: ")
 			senha = input("Digite sua nova SENHA: ")
 
-			menu2 = Cadastro(cpf,email,senha)
+			menu2 = Cadastro(cpf,senha)
 			print("\nLOG: %s"%(Log[menu2]))
 
 			if(menu2!=1):
