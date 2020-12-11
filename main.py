@@ -171,6 +171,8 @@ while(menu1!=3):
 
 		volta = False 
 
+		usuario = Usuario("","","")
+
 		while(menu2 != 1):
 
 			cpf = ""
@@ -192,6 +194,9 @@ while(menu1!=3):
 					volta = True
 					break
 			else:
+				usuario.SetCpf(cpf)
+				usuario.SetEmail(email)
+				usuario.SetSenha(senha)
 				os.system("pause")
 
 		os.system("cls")
