@@ -6,6 +6,7 @@ class Filme:
 		self.Id = Id
 		self.Nome = Nome
 		self.Descricao = Descricao
+		self.Funcionario = Funcionario
 
 	def GetFuncionario(self):
 		return self.Funcionario

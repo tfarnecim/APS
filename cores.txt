@@ -1,0 +1,6 @@
+background-color: rgb(105, 253, 255); fundo
+background-color: rgb(255, 172, 55); botão normal
+background-color: rgb(255, 55, 55); botão perigo
+background-color: rgb(85, 255, 0); botão confirmar
+
+Fonte: Bahnschrift SemiBold

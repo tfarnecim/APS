@@ -8,7 +8,7 @@ class Usuario:
 	def SetCpf(self, Cpf):
 		self.Cpf = Cpf
 
-	def GetCpf(self, Cpf):
+	def GetCpf(self):
 		return self.Cpf
 
 	def SetEmail(self, Email):
