@@ -140,14 +140,24 @@ def LogarCliente():
 
 	return 1
 
+def VoltaPrincipal():
+	TelaPrincipalCliente.hide()
+	TelaInicioCliente.show()
+
+def CompraPrincipal():
+	pass
+
+def UsaPrincipal():
+	pass
+
 #cria a aplicação
 app = QtWidgets.QApplication([])
 
 #carrega todas as telas criadas
-TelaInicioCliente      = uic.loadUi("Telas/TelaInicioCliente.ui")
-TelaRegistroCliente    = uic.loadUi("Telas/TelaRegistroCliente.ui")
-TelaLoginCliente       = uic.loadUi("Telas/TelaLoginCliente.ui")
-TelaPrincipalCliente   = uic.loadUi("Telas/TelaPrincipalCliente.ui")
+TelaInicioCliente     = uic.loadUi("Telas/TelaInicioCliente.ui")
+TelaRegistroCliente   = uic.loadUi("Telas/TelaRegistroCliente.ui")
+TelaLoginCliente      = uic.loadUi("Telas/TelaLoginCliente.ui")
+TelaPrincipalCliente  = uic.loadUi("Telas/TelaPrincipalCliente.ui")
 
 #explica aos botões quais funções devem ser acionadas ao serem clicados
 
@@ -161,7 +171,9 @@ TelaRegistroCliente.pushButton_2.clicked.connect(VoltaRegistro)
 TelaLoginCliente.pushButton.clicked.connect(LogarCliente)
 TelaLoginCliente.pushButton_2.clicked.connect(VoltaLogin)
 
-TelaPrincipalCliente
+TelaPrincipalCliente.pushButton.clicked.connect(CompraPrincipal)
+TelaPrincipalCliente.pushButton_2.clicked.connect(UsaPrincipal)
+TelaPrincipalCliente.pushButton_3.clicked.connect(VoltaPrincipal)
 
 #cria o usuario que está usando o programa
 
