@@ -1,5 +1,6 @@
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QLineEdit, QLabel
+from PyQt5.QtWidgets import QMessageBox, QLineEdit, QLabel, QListWidget
+from PyQt5 import QtGui
 
 from usuario import Usuario
 from sessao import Sessao
@@ -100,9 +101,6 @@ def RegistrarCliente():
 	TelaRegistroCliente.hide()
 	TelaInicioCliente.show()
 
-	c.SetCpf(Cpf)
-	c.SetSenha(Senha)
-
 	return 1
 
 
@@ -145,10 +143,25 @@ def VoltaPrincipal():
 	TelaInicioCliente.show()
 
 def CompraPrincipal():
+	
+	TelaPrincipalCliente.hide()
+	TelaListarFilmes.show()
+
+	TelaListarFilmes.listWidget.addItem("BANANA")
+
 	pass
 
 def UsaPrincipal():
 	pass
+
+def SolicitarCompra():
+	if(TelaListarFilmes.listWidget.count() < 2):
+		TelaListarFilmes.listWidget.addItem("MACA")
+	else:
+		texto = TelaListarFilmes.listWidget.selectedItems()
+		if(len(texto) == 0):
+			return 0
+		TelaListarFilmes.label_2.setText(texto[0].text())
 
 #cria a aplicação
 app = QtWidgets.QApplication([])
@@ -158,6 +171,7 @@ TelaInicioCliente     = uic.loadUi("Telas/TelaInicioCliente.ui")
 TelaRegistroCliente   = uic.loadUi("Telas/TelaRegistroCliente.ui")
 TelaLoginCliente      = uic.loadUi("Telas/TelaLoginCliente.ui")
 TelaPrincipalCliente  = uic.loadUi("Telas/TelaPrincipalCliente.ui")
+TelaListarFilmes      = uic.loadUi("Telas/TelaListarFilmes.ui")
 
 #explica aos botões quais funções devem ser acionadas ao serem clicados
 
@@ -174,6 +188,9 @@ TelaLoginCliente.pushButton_2.clicked.connect(VoltaLogin)
 TelaPrincipalCliente.pushButton.clicked.connect(CompraPrincipal)
 TelaPrincipalCliente.pushButton_2.clicked.connect(UsaPrincipal)
 TelaPrincipalCliente.pushButton_3.clicked.connect(VoltaPrincipal)
+
+TelaListarFilmes.pushButton.clicked.connect(SolicitarCompra)
+
 
 #cria o usuario que está usando o programa
 
