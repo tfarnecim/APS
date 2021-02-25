@@ -81,7 +81,7 @@
      </font>
     </property>
     <property name="text">
-     <string>RESGISTRAR</string>
+     <string>REGISTRAR</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">

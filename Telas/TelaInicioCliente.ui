@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>230</y>
+      <y>270</y>
       <width>231</width>
       <height>41</height>
      </rect>
@@ -46,7 +46,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>280</y>
+      <y>320</y>
       <width>231</width>
       <height>41</height>
      </rect>
@@ -71,7 +71,7 @@
     <property name="geometry">
      <rect>
       <x>260</x>
-      <y>330</y>
+      <y>370</y>
       <width>231</width>
       <height>41</height>
      </rect>
@@ -95,22 +95,17 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>80</y>
-      <width>291</width>
-      <height>81</height>
+      <x>230</x>
+      <y>10</y>
+      <width>301</width>
+      <height>261</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Bahnschrift SemiBold</family>
-      <pointsize>26</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
-    </property>
     <property name="text">
-     <string>Cinema cidade luz</string>
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>Imagens/Cinema Logo.png</pixmap>
     </property>
    </widget>
   </widget>
@@ -126,6 +121,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="../seila.qrc"/>
+ </resources>
  <connections/>
 </ui>
