@@ -14,6 +14,101 @@ import os
 
 #Inicio das User Stories do programa
 
+def AdicionarFilme():
+
+	nome = TelaAdicionarFilme.lineEdit.text()
+
+	if(nome=="" or len(nome) > 40):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'nome do filme' deve ser preenchido\ne deve conter no máximo 40 caracteres.")
+		return 1
+
+	sinopse = TelaAdicionarFilme.textEdit.toPlainText()
+
+	if(sinopse=="" or len(nome) > 200):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'sinopse do filme' deve ser preenchido\ne deve conter no máximo 200 caracteres.")
+		return 1
+
+
+	linhas = TelaAdicionarFilme.tableWidget.rowCount()
+
+	if(linhas == 0):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "Você deve adicionar pelo menos uma sessão ao filme")
+		return 1
+
+	dia          = []
+	mes          = []
+	ano          = []
+	numsala      = []
+	iniciohora   = []
+	iniciominuto = []
+
+	for i in range(linhas):
+
+		itemdata    = TelaAdicionarFilme.tableWidget.item(i,0)
+		iteminicio  = TelaAdicionarFilme.tableWidget.item(i,1)
+		itemnumsala = TelaAdicionarFilme.tableWidget.item(i,2)
+
+		strdata    = itemdata.text()
+		strinicio  = iteminicio.text()
+		strnumsala = itemnumsala.text()
+
+		dia.append(int(strdata[0]+strdata[1]))
+		mes.append(int(strdata[3]+strdata[4]))
+		ano.append(int(strdata[6]+strdata[7]+strdata[8]+strdata[9]))
+
+		numsala.append(int(strnumsala))
+
+		iniciohora.append(int(strinicio[0]+strinicio[1]))
+		iniciominuto.append(int(strinicio[3]+strinicio[4]))
+
+	IDFILME = -1
+
+	for i in range(1000000):
+		
+		con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+		cur = con.cursor()
+		cur.execute("select id from filme where id='%d';"%(i))
+		l = cur.fetchall()
+		con.close()
+
+		if(len(l) == 0):
+			IDFILME = i
+			break
+
+	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+	cur = con.cursor()
+	cur.execute("insert into filme values('%d','%s','%s','%s');"%(IDFILME,sinopse,nome,f.GetCpf()))
+	con.commit()
+	con.close()
+
+	for i in range(linhas):
+
+		IDSESSAO = -1
+		
+		for i in range(1000000):
+		
+			con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+			cur = con.cursor()
+			cur.execute("select id from sessao where id='%d';"%(i))
+			l = cur.fetchall()
+			con.close()
+
+			if(len(l) == 0):
+				IDSESSAO = i
+				break
+
+		con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+		cur = con.cursor()
+		cur.execute("insert into sessao values('%d','%d','%d','%d','%d','%d','%d','%d');"%(IDSESSAO,dia[i],mes[i],ano[i],numsala[i],IDFILME,iniciohora[i],iniciominuto[i]))
+		con.commit()
+		con.close()
+
+	QMessageBox.about(TelaAdicionarFilme, "Aviso", "O filme foi adicionado ao catálogo com sucesso!")
+	TelaAdicionarFilme.hide()
+	TelaPrincipalFuncionario.show()
+	return 1
+
+
 def AdicionarSessao():
 
 	data = TelaAdicionarSessao.calendarWidget.selectedDate()
@@ -25,8 +120,22 @@ def AdicionarSessao():
 	ok = True
 
 	numsala = TelaAdicionarSessao.lineEdit_4.text()
+	
+	if(numsala == ""):
+		QMessageBox.about(TelaAdicionarSessao, "Aviso", "O campo 'número da sala' deve ser preenchido")
+		return 1
+
 	iniciohora  = TelaAdicionarSessao.lineEdit_5.text()
+
+	if(iniciohora == ""):
+		QMessageBox.about(TelaAdicionarSessao, "Aviso", "O campo 'hora de início' deve ser preenchido")
+		return 1
+
 	iniciominuto = TelaAdicionarSessao.lineEdit_6.text()
+
+	if(iniciominuto == ""):
+		QMessageBox.about(TelaAdicionarSessao, "Aviso", "O campo 'minuto de início' deve ser preenchido")
+		return 1
 
 	for caractere in numsala:
 		if(not caractere.isdigit()):
@@ -57,7 +166,7 @@ def AdicionarSessao():
 
 	NUMSALA = int(numsala)
 	INICIOHORA  = int(iniciohora)
-	INICIOMINUTO = int(iniciohora)
+	INICIOMINUTO = int(iniciominuto)
 
 	if(INICIOHORA > 23):
 		QMessageBox.about(TelaAdicionarSessao, "Aviso", "No campo 'horário de início(horas)', apenas são aceitos números no intervalo [0,23]")
@@ -70,8 +179,40 @@ def AdicionarSessao():
 	ultimaposicao = TelaAdicionarFilme.tableWidget.rowCount()
 	TelaAdicionarFilme.tableWidget.insertRow(ultimaposicao)
 
-	TelaAdicionarFilme.tableWidget.setItem(ultimaposicao, 0, QtWidgets.QTableWidgetItem(str(dia)+'/'+str(mes)+'/'+str(ano)))
-	TelaAdicionarFilme.tableWidget.setItem(ultimaposicao, 1, QtWidgets.QTableWidgetItem(str(INICIOHORA)+':'+str(INICIOMINUTO)))
+	datacorreta = ""
+
+	if(len(str(dia)) < 2):
+		datacorreta += '0'+str(dia)
+	else:
+		datacorreta += str(dia)
+
+	datacorreta += '/'
+
+	if(len(str(mes)) < 2):
+		datacorreta += '0'+str(mes)
+	else:
+		datacorreta += str(mes)
+
+	datacorreta += '/' + str(ano)
+
+	#ARRUMANDO A HORA
+
+	horacorreta = ""
+
+	if(len(str(INICIOHORA)) < 2):
+		horacorreta += '0'+str(INICIOHORA)
+	else:
+		horacorreta += str(INICIOHORA)
+
+	horacorreta += ':'
+
+	if(len(str(INICIOMINUTO)) < 2):
+		horacorreta += '0'+str(INICIOMINUTO)
+	else:
+		horacorreta += str(INICIOMINUTO)	
+
+	TelaAdicionarFilme.tableWidget.setItem(ultimaposicao, 0, QtWidgets.QTableWidgetItem(datacorreta))
+	TelaAdicionarFilme.tableWidget.setItem(ultimaposicao, 1, QtWidgets.QTableWidgetItem(horacorreta))
 	TelaAdicionarFilme.tableWidget.setItem(ultimaposicao, 2, QtWidgets.QTableWidgetItem(str(NUMSALA)))
 
 	QMessageBox.about(TelaAdicionarSessao, "Aviso", "Sessão adicionada com sucesso!")
@@ -79,7 +220,29 @@ def AdicionarSessao():
 	TelaAdicionarSessao.hide()
 
 def RemoverSessao():
-	return 1
+	
+	linhas = TelaAdicionarFilme.tableWidget.rowCount()
+
+	l = -1
+
+	for i in range (linhas):
+		for j in range (3):
+
+			item = QtWidgets.QTableWidgetItem()
+
+			item = TelaAdicionarFilme.tableWidget.item(i,j)
+
+			if(item.isSelected()):
+				l = i
+				i = linhas
+				break
+
+	if(l==-1):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "Selecione uma sessão para remover!")
+		return 1
+
+	TelaAdicionarFilme.tableWidget.removeRow(i-1)
+
 
 def AdicionarsAdicionarf():
 	TelaAdicionarSessao.hide()
@@ -199,6 +362,9 @@ def Cadastro():
 	return 1
 
 
+#cria o usuario que está usando o programa
+f = Funcionario("","")
+
 #cria a aplicação
 app = QtWidgets.QApplication([])
 
@@ -222,15 +388,13 @@ TelaPrincipalFuncionario.pushButton_2.clicked.connect(PrincipalRemover)
 
 TelaAdicionarFilme.pushButton.clicked.connect(AdicionarPrincipal)
 TelaAdicionarFilme.pushButton_2.clicked.connect(AdicionarfAdicionars)
+TelaAdicionarFilme.pushButton_3.clicked.connect(AdicionarFilme)
 TelaAdicionarFilme.pushButton_4.clicked.connect(RemoverSessao)
 
 TelaAdicionarSessao.pushButton.clicked.connect(AdicionarsAdicionarf)
 TelaAdicionarSessao.pushButton_2.clicked.connect(AdicionarSessao)
 
 TelaRemoverFilme.pushButton.clicked.connect(RemoverPrincipal)
-
-#cria o usuario que está usando o programa
-f = Funcionario("","")
 
 #chama a tela em que o programa deve começar
 TelaLoginFuncionario.show()
