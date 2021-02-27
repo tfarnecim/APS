@@ -1,7 +1,8 @@
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QMessageBox, QLineEdit, QLabel, QListWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QMessageBox, QLineEdit, QLabel, QListWidget, QTableWidgetItem, QListWidgetItem
 from PyQt5 import QtGui
-
+import datetime
+from datetime import date
 import PyQt5
 
 from filme import Filme
@@ -12,7 +13,125 @@ from funcionario import Funcionario
 import psycopg2
 import os
 
+def SELECT(lista,tabela,where,coluna,condicao):#a condição será apenas um =
+	
+	comando = "select "
+
+	for i in range(len(lista)):
+		
+		if(i != 0):
+			comando += ","
+
+		comando += lista[i]
+	
+	comando += " from " + tabela + " "
+
+	if(where == False):
+		con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+		cur = con.cursor()
+		cur.execute(comando+";")
+		l = cur.fetchall()
+		con.close()		
+		return l
+
+	numero = True
+
+	comando += "where " + coluna + " = "
+
+	for j in condicao:
+		if(not j.isdigit()):
+			numero = False
+
+	if(numero):
+		comando += condicao
+	else:
+		comando += "'" + condicao + "'"
+
+	comando += ";"
+
+	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+	cur = con.cursor()
+	cur.execute(comando)
+	l = cur.fetchall()
+	con.close()		
+	return l
+
+
+def INSERT(tabela,lista):
+
+	comando = "insert into " + tabela + " values("
+
+	for i in range(len(lista)):
+
+		numero = True
+
+		for j in lista[i]:
+			if(not j.isdigit()):
+				numero = False
+
+		if(i != 0):
+			comando += ","
+
+		if(numero):
+			comando += lista[i]
+		else:
+			comando += "'" + lista[i] + "'"
+
+	comando += ");"
+
+	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+	cur = con.cursor()
+	cur.execute(comando)
+	con.commit()
+	con.close()
+
+def DELETE(tabela, coluna, condicao):
+	comando = "delete from " + tabela + " where " + coluna + " = " + condicao
+	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+	cur = con.cursor()
+	cur.execute(comando)
+	con.commit()
+	con.close()	
+
+
 #Inicio das User Stories do programa
+
+def RemoverFilme():
+	
+	p = -1
+
+	linhas = TelaRemoverFilme.listWidget.count()
+
+	for i in range(linhas):
+		Item = TelaRemoverFilme.listWidget.item(i)
+		if(Item.isSelected()):
+			p = i
+			break
+
+	if(p==-1):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "Selecione algum filme para remover!")
+		return 1
+
+	ItemSelecionado = TelaRemoverFilme.listWidget.item(p)
+
+	nome = ItemSelecionado.text()
+
+	l = SELECT(["id"],"filme",True,"nome",nome)
+	Id_filme = int(l[0][0])
+
+	ids_sessao = SELECT(["id"], "sessao", True, "id_filme", str(Id_filme))
+	
+	for i in range(len(ids_sessao)):
+		DELETE("bilhete","id_sessao",str(ids_sessao[i][0]))		
+
+	DELETE("sessao","id_filme",str(Id_filme))
+	DELETE("filme","id",str(Id_filme))
+	
+	TelaRemoverFilme.listWidget.takeItem(p)
+
+	QMessageBox.about(TelaAdicionarFilme, "Aviso", "Filme removido com sucesso")
+	return 1
+
 
 def AdicionarFilme():
 
@@ -20,6 +139,35 @@ def AdicionarFilme():
 
 	if(nome=="" or len(nome) > 40):
 		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'nome do filme' deve ser preenchido\ne deve conter no máximo 40 caracteres.")
+		return 1
+
+	l = SELECT(["nome"],"filme",True,"nome",nome)
+
+	if(len(l) > 0):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "Um filme com este nome já está cadastrado no catálogo!")
+		return 1
+
+	strduracaohora = TelaAdicionarFilme.lineEdit_2.text()
+
+	if(len(strduracaohora) == 0 or len(strduracaohora) > 2):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'duração (horas)' deve ser preenchido\ne deve ter no máximo um dígito")
+		return 1		
+
+	if(not strduracaohora.isdigit()):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'duração (horas)' deve ser um número")
+		return 1
+
+	strduracaominuto = TelaAdicionarFilme.lineEdit_3.text()
+
+	if(len(strduracaominuto) == 0 or len(strduracaominuto) > 3):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'duração (minutos)' deve ser preenchido\ne deve ter no máximo dois dígitos")
+		return 1		
+
+	if(len(strduracaominuto) == 1):
+		strduracaominuto = "0" + strduracaominuto
+
+	if((not strduracaominuto[0].isdigit()) or (not strduracaominuto[1].isdigit())):
+		QMessageBox.about(TelaAdicionarFilme, "Aviso", "O campo 'duração (minutos)' deve ser um número")
 		return 1
 
 	sinopse = TelaAdicionarFilme.textEdit.toPlainText()
@@ -61,49 +209,71 @@ def AdicionarFilme():
 		iniciohora.append(int(strinicio[0]+strinicio[1]))
 		iniciominuto.append(int(strinicio[3]+strinicio[4]))
 
+		#strduracaominuto
+		#strduracaohora
+'''
+		data1 = datetime.datetime(ano[i],mes[i],dia[i],iniciohora[i],iniciominuto[i])
+
+		l = SELECT(["ano","mes","dia","inicio_hora","inicio_minuto","id_filme"],"sessao",False,"nsala",numsala[i])
+
+		for j in range (len(l)):
+			
+			data2 = datetime.datetime(int(l[j][0]),int(l[j][1]),int(l[j][2]),int(l[j][3]),int(l[j][4]))
+			data3 = data1 - data2
+
+			duracao = SELECT(["duracao_hora","duracao_minuto","nome"],"filme",True,"id",str(l[j][5]))
+
+			if(data3.days == 0):
+
+				tempo1ini = iniciohora[i]*60+iniciominuto[i]
+				tempo1fim = iniciohora[i]*60+iniciominuto[i]+int(strduracaohora)*60+int(strduracaominuto)
+				tempo2ini = int(l[j][3])*60+int(l[j][4])
+				tempo2fim = int(l[j][3])*60+int(l[j][4])+int(duracao[0][0])*60+int(duracao[0][1])
+
+				if(not(tempo1fim < tempo2ini or tempo2fim < tempo1ini)):
+					resposta = "Na hora que a sessao " + str(i+1) + " estiver sendo exibida na sala " + str(numsala[i]) + " o filme " + str(duracao[0][3]) + " também tem uma sessão a ser exibida nesta sala\n"
+					QMessageBox.about(TelaAdicionarFilme, "Aviso", resposta)
+					return 1'''
+
+
+
 	IDFILME = -1
 
 	for i in range(1000000):
 		
-		con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
-		cur = con.cursor()
-		cur.execute("select id from filme where id='%d';"%(i))
-		l = cur.fetchall()
-		con.close()
+		l = SELECT(["id"],"filme",True,"id",str(i))
 
 		if(len(l) == 0):
 			IDFILME = i
 			break
 
-	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
-	cur = con.cursor()
-	cur.execute("insert into filme values('%d','%s','%s','%s');"%(IDFILME,sinopse,nome,f.GetCpf()))
-	con.commit()
-	con.close()
-
+	INSERT("filme",[str(IDFILME),sinopse,nome,f.GetCpf(),strduracaohora,strduracaominuto])
+	
 	for i in range(linhas):
 
 		IDSESSAO = -1
 		
-		for i in range(1000000):
+		for j in range(1000000):
 		
-			con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
-			cur = con.cursor()
-			cur.execute("select id from sessao where id='%d';"%(i))
-			l = cur.fetchall()
-			con.close()
+			l = SELECT(["id"],"sessao",True,"id",str(j))
 
 			if(len(l) == 0):
-				IDSESSAO = i
+				IDSESSAO = j
 				break
 
-		con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
-		cur = con.cursor()
-		cur.execute("insert into sessao values('%d','%d','%d','%d','%d','%d','%d','%d');"%(IDSESSAO,dia[i],mes[i],ano[i],numsala[i],IDFILME,iniciohora[i],iniciominuto[i]))
-		con.commit()
-		con.close()
+		INSERT("sessao",[str(IDSESSAO),str(dia[i]),str(mes[i]),str(ano[i]),str(numsala[i]),str(IDFILME),str(iniciohora[i]),str(iniciominuto[i])])
 
 	QMessageBox.about(TelaAdicionarFilme, "Aviso", "O filme foi adicionado ao catálogo com sucesso!")
+	
+	TelaAdicionarFilme.lineEdit.setText("")
+	TelaAdicionarFilme.lineEdit_2.setText("")
+	TelaAdicionarFilme.lineEdit_3.setText("")
+
+	while(TelaAdicionarFilme.tableWidget.rowCount() > 0):
+		TelaAdicionarFilme.tableWidget.removeRow(0)
+	
+	TelaAdicionarFilme.textEdit.setText("")
+
 	TelaAdicionarFilme.hide()
 	TelaPrincipalFuncionario.show()
 	return 1
@@ -116,6 +286,16 @@ def AdicionarSessao():
 	dia = data.day()
 	mes = data.month()
 	ano = data.year()
+
+	data1 = date(int(ano),int(mes),int(dia))
+	data2 = datetime.datetime.now()
+	data3 = date(int(data2.year),int(data2.month),int(data2.day))
+
+	data4 = data1 - data3
+
+	if(data4.days < 2):
+		QMessageBox.about(TelaAdicionarSessao, "Aviso", "A data da sessão deve estar a no mínimo 2 dias da hora atual.")
+		return 1
 
 	ok = True
 
@@ -217,6 +397,10 @@ def AdicionarSessao():
 
 	QMessageBox.about(TelaAdicionarSessao, "Aviso", "Sessão adicionada com sucesso!")
 
+	TelaAdicionarSessao.lineEdit_4.setText("")
+	TelaAdicionarSessao.lineEdit_5.setText("")
+	TelaAdicionarSessao.lineEdit_6.setText("")
+
 	TelaAdicionarSessao.hide()
 
 def RemoverSessao():
@@ -255,8 +439,22 @@ def PrincipalAdicionar():
 	TelaAdicionarFilme.show()
 
 def PrincipalRemover():
+	
 	TelaPrincipalFuncionario.hide()
 	TelaRemoverFilme.show()
+
+	TelaRemoverFilme.listWidget.clear()
+
+	con = psycopg2.connect(database='Cinema', user='postgres', password='postgres')
+	cur = con.cursor()
+	cur.execute("select nome from filme;")
+	l = cur.fetchall()
+	con.close()
+
+	for i in range(len(l)):
+		Item = QListWidgetItem()
+		Item.setText(str(l[i][0]))
+		TelaRemoverFilme.listWidget.addItem(Item)
 
 
 def RemoverPrincipal():
@@ -395,6 +593,7 @@ TelaAdicionarSessao.pushButton.clicked.connect(AdicionarsAdicionarf)
 TelaAdicionarSessao.pushButton_2.clicked.connect(AdicionarSessao)
 
 TelaRemoverFilme.pushButton.clicked.connect(RemoverPrincipal)
+TelaRemoverFilme.pushButton_2.clicked.connect(RemoverFilme)
 
 #chama a tela em que o programa deve começar
 TelaLoginFuncionario.show()
